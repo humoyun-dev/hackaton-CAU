@@ -14,9 +14,10 @@ import { Meal } from "../screens/type";
 
 interface FoodItemProps {
   item: Meal;
+  index: number;
 }
 
-const FoodItem: React.FC<FoodItemProps> = ({ item }) => {
+const FoodItem: React.FC<FoodItemProps> = ({ item, index }) => {
   const navigation = useNavigation();
   const { addToWish, removeFromWish, isItWish } = useWish();
   const isFavourite = isItWish(item.id);
@@ -38,8 +39,7 @@ const FoodItem: React.FC<FoodItemProps> = ({ item }) => {
     <View style={styles.foodItemContainer}>
       <TouchableOpacity onPress={handlePress} style={styles.imageContainer}>
         <Image
-          // @ts-ignore
-          source={{ uri: item.image || "https://via.placeholder.com/150" }}
+          source={require(`../../assets/meals/meal_1.jpeg`)}
           style={styles.foodItemImage}
         />
       </TouchableOpacity>

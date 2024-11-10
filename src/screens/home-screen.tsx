@@ -100,7 +100,7 @@ const HomeScreen: React.FC = () => {
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: Meal }) => <FoodItem item={item} />,
+    ({ item, index }: { item: Meal, index: number }) => <FoodItem index={index} item={item} />,
     []
   );
 

@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 3.7.2",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "image": "ubuntu-20.04-jdk-11-ndk-r19c"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "image": "ubuntu-20.04-jdk-11-ndk-r19c"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "android": {
+        "image": "ubuntu-20.04-jdk-11-ndk-r19c"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

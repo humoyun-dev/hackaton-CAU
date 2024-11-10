@@ -16,7 +16,7 @@ const WishScreen: React.FC = () => {
       ) : (
         <FlatList
           data={wishList}
-          renderItem={({ item }) => <FoodItem item={item} />}
+          renderItem={({ item, index }) => <FoodItem index={index} item={item} />}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
           contentContainerStyle={styles.flatListContent}

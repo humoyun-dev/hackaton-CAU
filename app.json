@@ -18,10 +18,34 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.humoyundev.safebite"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7098add9-78ba-472d-a972-d9b54a9930dd"
+      }
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 33,
+            "buildToolsVersion": "33.0.0",
+            "minSdkVersion": 21,
+            "compileOptions": {
+              "sourceCompatibility": "11",
+              "targetCompatibility": "11"
+            },
+            "kotlinVersion": "1.6.10"
+          }
+        }
+      ]
+    ]
   }
 }
