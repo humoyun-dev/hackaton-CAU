@@ -11,7 +11,7 @@ import {
 import { ProgressChart } from "react-native-chart-kit";
 import { LinearGradient } from "expo-linear-gradient";
 import MultiSelect from "react-native-multiple-select";
-import { diseases } from "../../data";
+import { diseases, allergies } from "../../data"; // Assuming you have allergies data in a similar structure
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -28,11 +28,17 @@ const HealthProfileScreen: React.FC = () => {
   const stepsProgress = healthData.steps / healthData.stepsGoal;
   const caloriesProgress = healthData.caloriesBurned / healthData.caloriesGoal;
   const sleepProgress = healthData.sleepHours / healthData.sleepGoal;
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [collapsed, setCollapsed] = useState(true); // To control collapsing and expanding
+  const [selectedDiseases, setSelectedDiseases] = useState([]);
+  const [selectedAllergies, setSelectedAllergies] = useState([]);
+  const [collapsedDiseases, setCollapsedDiseases] = useState(true);
+  const [collapsedAllergies, setCollapsedAllergies] = useState(true);
 
-  const onSelectedItemsChange = (newSelectedItems: any) => {
-    setSelectedItems(newSelectedItems);
+  const onSelectedDiseasesChange = (newSelectedItems: any) => {
+    setSelectedDiseases(newSelectedItems);
+  };
+
+  const onSelectedAllergiesChange = (newSelectedItems: any) => {
+    setSelectedAllergies(newSelectedItems);
   };
 
   const data = {
@@ -47,14 +53,15 @@ const HealthProfileScreen: React.FC = () => {
       </LinearGradient>
 
       <ScrollView contentContainerStyle={styles.contentContainer}>
+        {/* Diseases Section */}
         <Text style={styles.sectionTitle}>Diseases</Text>
         <View className="w-full">
           <MultiSelect
             hideTags
             items={diseases}
             uniqueKey="id"
-            onSelectedItemsChange={onSelectedItemsChange}
-            selectedItems={selectedItems}
+            onSelectedItemsChange={onSelectedDiseasesChange}
+            selectedItems={selectedDiseases}
             selectText="Select Diseases"
             searchInputPlaceholderText="Search Diseases..."
             altFontFamily="ProximaNova-Light"
@@ -71,19 +78,21 @@ const HealthProfileScreen: React.FC = () => {
           />
         </View>
 
-        {/* Collapsible selected items section */}
+        {/* Collapsible Diseases Section */}
         <TouchableOpacity
           style={styles.toggleButton}
-          onPress={() => setCollapsed(!collapsed)} // Toggle collapse state
+          onPress={() => setCollapsedDiseases(!collapsedDiseases)} // Toggle collapse state
         >
           <Text style={styles.toggleButtonText}>
-            {collapsed ? "Show Selected Diseases" : "Hide Selected Diseases"}
+            {collapsedDiseases
+              ? "Show Selected Diseases"
+              : "Hide Selected Diseases"}
           </Text>
         </TouchableOpacity>
 
         {/* Conditionally render selected diseases */}
-        {!collapsed && selectedItems.length > 0 ? (
-          selectedItems.map((itemId) => {
+        {!collapsedDiseases && selectedDiseases.length > 0 ? (
+          selectedDiseases.map((itemId) => {
             const item = diseases.find((i) => i.id === itemId);
             return (
               <View key={itemId} style={styles.itemContainer}>
@@ -92,9 +101,61 @@ const HealthProfileScreen: React.FC = () => {
             );
           })
         ) : (
-          <Text style={styles.noSelectionText}>No diseases selected</Text>
+          <></>
         )}
 
+        {/* Allergies Section */}
+        <Text style={styles.sectionTitle}>Allergies</Text>
+        <View className="w-full">
+          <MultiSelect
+            hideTags
+            items={allergies}
+            uniqueKey="id"
+            onSelectedItemsChange={onSelectedAllergiesChange}
+            selectedItems={selectedAllergies}
+            selectText="Select Allergies"
+            searchInputPlaceholderText="Search Allergies..."
+            altFontFamily="ProximaNova-Light"
+            tagRemoveIconColor="#ff5722"
+            tagBorderColor="#ff5722"
+            tagTextColor="#ff5722"
+            selectedItemTextColor="#ff5722"
+            selectedItemIconColor="#ff5722"
+            itemTextColor="#000"
+            displayKey="name"
+            searchInputStyle={{ color: "#000" }}
+            submitButtonColor="#ff5722"
+            submitButtonText="Submit"
+          />
+        </View>
+
+        {/* Collapsible Allergies Section */}
+        <TouchableOpacity
+          style={styles.toggleButton}
+          onPress={() => setCollapsedAllergies(!collapsedAllergies)} // Toggle collapse state
+        >
+          <Text style={styles.toggleButtonText}>
+            {collapsedAllergies
+              ? "Show Selected Allergies"
+              : "Hide Selected Allergies"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Conditionally render selected allergies */}
+        {!collapsedAllergies && selectedAllergies.length > 0 ? (
+          selectedAllergies.map((itemId) => {
+            const item = allergies.find((i) => i.id === itemId);
+            return (
+              <View key={itemId} style={styles.itemContainer}>
+                <Text style={styles.itemText}>{item?.name}</Text>
+              </View>
+            );
+          })
+        ) : (
+          <></>
+        )}
+
+        {/* Progress Chart */}
         <ProgressChart
           data={data}
           width={screenWidth - 32}
@@ -106,6 +167,7 @@ const HealthProfileScreen: React.FC = () => {
           style={styles.chartStyle}
         />
 
+        {/* Health Stats */}
         <View style={styles.statsContainer}>
           <Text style={styles.statText}>
             Steps:{" "}
@@ -129,6 +191,7 @@ const HealthProfileScreen: React.FC = () => {
           </Text>
         </View>
 
+        {/* Wellness Tips */}
         <View style={styles.tipsSection}>
           <Text style={styles.tipsHeader}>Wellness Tips</Text>
           <View style={styles.tipsContainer}>
@@ -196,8 +259,25 @@ const styles = StyleSheet.create({
   },
   toggleButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "#fff",
+    fontWeight: "bold",
+  },
+  itemContainer: {
+    padding: 8,
+    marginVertical: 6,
+    backgroundColor: "#e0f7fa",
+    borderRadius: 8,
+    width: "80%",
+    alignItems: "center",
+  },
+  itemText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  noSelectionText: {
+    fontSize: 16,
+    color: "#6b7280",
+    textAlign: "center",
   },
   chartStyle: {
     marginVertical: 8,
@@ -247,25 +327,6 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     marginVertical: 4,
     paddingLeft: 10,
-  },
-  itemContainer: {
-    marginTop: 8,
-    padding: 12,
-    backgroundColor: "#ffffff",
-    borderRadius: 8,
-    elevation: 2,
-    width: "100%",
-  },
-  itemText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  noSelectionText: {
-    fontSize: 16,
-    color: "#999",
-    fontStyle: "italic",
-    textAlign: "center",
-    marginTop: 8,
   },
 });
 
