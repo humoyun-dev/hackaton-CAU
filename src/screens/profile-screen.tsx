@@ -1,5 +1,12 @@
 import React from "react";
-import { SafeAreaView, Text, View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  SafeAreaView,
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
@@ -10,7 +17,12 @@ interface ProfileCardProps {
   onPress: () => void;
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ icon, title, description, onPress }) => (
+const ProfileCard: React.FC<ProfileCardProps> = ({
+  icon,
+  title,
+  description,
+  onPress,
+}) => (
   <TouchableOpacity onPress={onPress} style={styles.cardContainer}>
     <Ionicons name={icon} size={30} color="#2563eb" style={styles.icon} />
     <View style={styles.cardContent}>
@@ -35,7 +47,8 @@ const ProfileScreen: React.FC = () => {
       id: "2",
       icon: "heart-outline",
       title: "Health Profile",
-      description: "View your health statistics, wellness tips, and personal goals.",
+      description:
+        "View your health statistics, wellness tips, and personal goals.",
       onPress: () => navigation.navigate("HealthProfile"),
     },
     {

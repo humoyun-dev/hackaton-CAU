@@ -18,12 +18,13 @@ const SettingsScreen: React.FC = () => {
 
   function handleLogout() {
     logout();
+    // @ts-ignore
     navigation.navigate("Login");
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.headerText}>App Settings</Text>
+      <Text className="mt-4" style={styles.headerText}>App Settings</Text>
 
       <View className="mx-3" style={styles.settingItem}>
         <Text style={styles.settingText}>Enable Notifications</Text>
@@ -52,7 +53,7 @@ const SettingsScreen: React.FC = () => {
       <TouchableOpacity className="mx-3" style={styles.settingItem}>
         <Text style={styles.settingText}>Language</Text>
       </TouchableOpacity>
-
+      
       <TouchableOpacity className="mx-3" onPress={handleLogout} style={styles.logoutButton}>
         <Text style={styles.logoutButtonText}>Log Out</Text>
       </TouchableOpacity>

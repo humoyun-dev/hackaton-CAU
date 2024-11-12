@@ -51,7 +51,7 @@ const LoginScreen: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await axios.post(
-        "https://ultimate-octopus-visually.ngrok-free.app/api/auth/login",
+        "https://ultimate-octopus-visually.ngrok-free.app/api/user/login",
         data
       );
 
@@ -141,6 +141,7 @@ const LoginScreen: React.FC = () => {
 
       <View style={styles.registerContainer}>
         <Text style={styles.registerText}>Don't have an account? </Text>
+        {/* @ts-ignore */}
         <TouchableOpacity onPress={() => navigation.navigate("Register")}>
           <Text style={styles.registerLink}>Register</Text>
         </TouchableOpacity>

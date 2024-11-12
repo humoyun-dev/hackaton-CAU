@@ -36,7 +36,7 @@ const FoodItem: React.FC<FoodItemProps> = ({ item, index }) => {
   };
 
   return (
-    <View style={styles.foodItemContainer}>
+    <View className="flex justify-between" style={styles.foodItemContainer}>
       <TouchableOpacity onPress={handlePress} style={styles.imageContainer}>
         <Image
           source={require(`../../assets/meals/meal_1.jpeg`)}
@@ -54,6 +54,18 @@ const FoodItem: React.FC<FoodItemProps> = ({ item, index }) => {
         />
       </TouchableOpacity>
       <Text style={styles.foodItemName}>{item.name}</Text>
+
+      <TouchableOpacity
+        style={{ borderRadius: 12 }}
+        className="w-full rounded-lg"
+      >
+        <Text
+          style={{ borderRadius: 12 }}
+          className="w-full py-1 text-lg text-center bg-gray-200 rounded-lg"
+        >
+          eat
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
