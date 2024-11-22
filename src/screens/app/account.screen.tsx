@@ -20,6 +20,7 @@ import {
 } from "lucide-react-native";
 import { LineChart } from "react-native-chart-kit";
 import { ActivityRingsCard } from "../../ui/animated-circle";
+import { HealthDashboard } from "../../ui/health-dashboard";
 
 const userProfile = {
   name: "John Appleseed",
@@ -70,6 +71,26 @@ const AccountSummary: React.FC = () => {
     },
   };
 
+  const dailyData = {
+    caloriesConsumed: 1800,
+    caloriesBurned: 2200,
+    steps: 8500,
+    heartRate: 72,
+    sleep: 7.5,
+    weight: 70,
+  };
+
+  const weeklyData = [
+    { caloriesConsumed: 1900, caloriesBurned: 2100, steps: 9000, heartRate: 70, sleep: 7, weight: 70.5 },
+    { caloriesConsumed: 2000, caloriesBurned: 2300, steps: 10000, heartRate: 72, sleep: 8, weight: 70.3 },
+    { caloriesConsumed: 1800, caloriesBurned: 2000, steps: 8000, heartRate: 71, sleep: 7.5, weight: 70.2 },
+    { caloriesConsumed: 2100, caloriesBurned: 2400, steps: 11000, heartRate: 73, sleep: 8, weight: 70.1 },
+    { caloriesConsumed: 1950, caloriesBurned: 2250, steps: 9500, heartRate: 72, sleep: 7.5, weight: 70 },
+    { caloriesConsumed: 2200, caloriesBurned: 2500, steps: 12000, heartRate: 74, sleep: 8.5, weight: 69.8 },
+    dailyData,
+  ];
+
+
   const chartConfig = {
     backgroundGradientFrom: colors.card.background,
     backgroundGradientTo: colors.card.background,
@@ -78,83 +99,6 @@ const AccountSummary: React.FC = () => {
     barPercentage: 0.5,
     useShadowColorFromDataset: false,
   };
-
-  const renderActivityRings = () => (
-    <>
-      <ActivityRingsCard />
-    </>
-  );
-
-  const renderActivityChart = () => {
-    const screenWidth = Dimensions.get("window").width * 0.9; 
-    const activityData = {
-      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], 
-      datasets: [
-        {
-          data: [400, 450, 500, 420, 480, 530, 600], 
-          color: () => colors.activityRings.move,
-        },
-        {
-          data: [20, 25, 30, 22, 27, 35, 40], 
-          color: () => colors.activityRings.exercise, 
-        },
-        {
-          data: [8, 9, 10, 7, 12, 11, 10], 
-          color: () => colors.activityRings.stand, 
-        },
-      ],
-    };
-
-    return (
-      <View
-        style={[
-          styles.chartContainer,
-          { backgroundColor: colors.card.background },
-        ]}
-      >
-        <Text style={[styles.chartTitle, { color: colors.text.primary }]}>
-          Activity Trends
-        </Text>
-        <LineChart
-          data={activityData}
-          width={screenWidth}
-          height={220}
-          chartConfig={{
-            backgroundGradientFrom: colors.background,
-            backgroundGradientTo: colors.background,
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => colors.text.secondary,
-            propsForDots: {
-              r: "6",
-              strokeWidth: "2",
-              stroke: colors.card.background,
-            },
-          }}
-          bezier
-          style={styles.chart}
-        />
-      </View>
-    );
-  };
-
-  const renderHeartRateChart = () => (
-    <View style={[styles.card, { backgroundColor: colors.card.background }]}>
-      <Text style={[styles.chartTitle, { color: colors.text.primary }]}>
-        Heart Rate
-      </Text>
-      <LineChart
-        data={heartRateData}
-        width={screenWidth - 32}
-        height={220}
-        chartConfig={{
-          ...chartConfig,
-          color: (opacity = 1) => `rgba(255, 45, 85, ${opacity})`,
-        }}
-        style={styles.chart}
-        bezier
-      />
-    </View>
-  );
 
   const renderSummaryCard = (
     icon: React.ReactNode,
@@ -197,9 +141,7 @@ const AccountSummary: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {renderActivityRings()}
-        {renderActivityChart()}
-        {renderHeartRateChart()}
+        <HealthDashboard />
 
         <View style={styles.summaryContainer}>
           {renderSummaryCard(

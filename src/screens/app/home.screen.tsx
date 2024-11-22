@@ -156,7 +156,7 @@ const HomeScreen: React.FC = () => {
           contentContainerStyle={styles.recommendationList}
         />
 
-        {renderSectionHeader({ title: "Apple Fitness+" })}
+        {renderSectionHeader({ title: "Fitness" })}
         <FlatList
           data={banners}
           horizontal

@@ -12,6 +12,7 @@ import FoodsNavigations from "./food.navigation";
 import { useTheme } from "../providers/theme.provider";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import FoodDetail from "../screens/app/food-detail";
+import FitnesDetailScreen from "../screens/app/fitnes-detail.screen";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator();
@@ -21,6 +22,7 @@ const HomeNavigations = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomeMain" component={HomeScreen} />
       <Stack.Screen name="FoodDetail" component={FoodDetail as any} />
+      <Stack.Screen name="FitnesDetail" component={FitnesDetailScreen as any} />
     </Stack.Navigator>
   );
 };

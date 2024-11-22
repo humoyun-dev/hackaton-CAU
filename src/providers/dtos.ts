@@ -9,7 +9,7 @@ export type OpenAIRole = 'system' | 'user' | 'assistant';
  */
 export interface OpenAIMessage {
   role: OpenAIRole; // Role can be 'system', 'user', or 'assistant'
-  content: string;  // The textual content of the message
+  content: any;  // The textual content of the message
   base64Image?: string; // Optional: Base64-encoded image string
   fileReference?: string; // Optional: File ID reference for uploaded images
 }
