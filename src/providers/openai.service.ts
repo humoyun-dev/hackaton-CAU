@@ -7,7 +7,7 @@ import {
 } from "./dtos";
 
 const OPENAI_API_KEY =
-  "";
+  "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";
 
 const OpenAIService = {
   /**

@@ -13,6 +13,7 @@ import { useTheme } from "../providers/theme.provider";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import FoodDetail from "../screens/app/food-detail";
 import FitnesDetailScreen from "../screens/app/fitnes-detail.screen";
+import ScannerNavigations from "./scanner.navigation";
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const Stack = createNativeStackNavigator();
@@ -84,7 +85,7 @@ const AppNavigations = () => {
     >
       <Tab.Screen name="Home" component={HomeNavigations} />
       <Tab.Screen name="Foods" component={FoodsNavigations} />
-      <Tab.Screen name="Scanner" component={ScannerScreen} />
+      <Tab.Screen name="Scanner" component={ScannerNavigations} />
       <Tab.Screen name="Account" component={AccountScreen} />
       <Tab.Screen name="Settings" component={SettingsNavigations} />
     </Tab.Navigator>

@@ -17,7 +17,7 @@ const PhotoPreviewSection = ({
   photo,
   handleRetakePhoto,
 }: {
-  photo: CameraCapturedPicture;
+  photo: string;
   handleRetakePhoto?: () => void;
 }) => {
   const scanAnimation = useRef(new Animated.Value(0)).current;
@@ -47,7 +47,7 @@ const PhotoPreviewSection = ({
       <View style={styles.imageContainer}>
         <Image
           style={styles.preview}
-          source={{ uri: 'data:image/jpg;base64,' + photo.base64 }}
+          source={{ uri: 'data:image/jpg;base64,' + photo }}
         />
 
         {/* Scanning animation */}

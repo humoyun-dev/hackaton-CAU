@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { OpenAIChatRequest, OpenAIChatResponse } from "../../providers/dtos";
 import OpenAIService from "../../providers/openai.service";
 import PhotoPreviewSection from "../../ui/photo-review";
+import { cleanJsonString, toArray } from "../../providers/parse";
 
 const { width } = Dimensions.get("window");
 
@@ -76,14 +77,12 @@ export default function CameraComponent() {
         throw new Error("Failed to capture the photo.");
       }
 
-      setCapturedPhoto(takenPhoto);
-
       const optimizeImage = async (uri: string): Promise<string> => {
         try {
           const optimizedImage = await ImageManipulator.manipulateAsync(
             uri,
-            [{ resize: { width: 470 } }],
-            { compress: 0.4, format: ImageManipulator.SaveFormat.JPEG }
+            [{ resize: { width: 430 } }],
+            { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
           );
 
           const base64Image = await ImageManipulator.manipulateAsync(
@@ -105,7 +104,7 @@ export default function CameraComponent() {
 
       const base64Image = await optimizeImage(takenPhoto.uri);
 
-      console.log("Optimized Image:", base64Image);
+      setCapturedPhoto(base64Image);
 
       const chatRequest: OpenAIChatRequest = {
         model: "gpt-4o",
@@ -167,18 +166,19 @@ export default function CameraComponent() {
 
       const aiResponse = response.choices[0].message.content;
 
-      console.log("AI Response:", aiResponse);
+      const parsedResponse = cleanJsonString(aiResponse);
+      const parsed = toArray(aiResponse);
 
-      if (aiResponse.success) {
-        // navigation.navigate("ResultsPage", {
-        //   photo: takenPhoto,
-        //   foods: aiResponse,
-        // });
+      if (parsed.success) {
+        // @ts-ignore
+        navigation.navigate("ResultsPage", {
+          photo: takenPhoto,
+          foods: parsedResponse,
+        });
       } else {
         Alert.alert("The image does not depict a dish");
       }
     } catch (error) {
-      console.error("Error during photo processing:", error.message || error);
       Alert.alert("Error during photo processing:");
     } finally {
       setLoading(false);
