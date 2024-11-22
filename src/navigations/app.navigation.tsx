@@ -6,7 +6,6 @@ import {
   AccountScreen,
   HomeScreen,
   ScannerScreen,
-  SettingsScreen,
 } from "../screens/app";
 import SettingsNavigations from "./settings.navigations";
 import FoodsNavigations from "./food.navigation";
@@ -21,7 +20,7 @@ const HomeNavigations = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomeMain" component={HomeScreen} />
-      <Stack.Screen name="FoodDetail" component={FoodDetail} />
+      <Stack.Screen name="FoodDetail" component={FoodDetail as any} />
     </Stack.Navigator>
   );
 };

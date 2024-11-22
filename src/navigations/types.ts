@@ -1,6 +1,10 @@
 export type AuthStackParamList = {
     Login: undefined;
     Register: undefined;
+    CustomizeProfile: undefined
+    AllergiesScreen: undefined
+    Main: undefined
+    DiseasesScreen: undefined
   };
   
   export type MainTabParamList = {
@@ -13,6 +17,7 @@ export type AuthStackParamList = {
   
   export type RootStackParamList = {
     Auth: undefined;
+    Loading: undefined
     Main: undefined;
   };
   

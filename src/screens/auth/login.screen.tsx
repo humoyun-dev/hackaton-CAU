@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Text,
   TextInput,
@@ -8,8 +8,11 @@ import {
   SafeAreaView,
   useColorScheme,
   StatusBar,
+  Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthStackParamList } from "../../navigations/types";
+// @ts-ignore
 import { StackNavigationProp } from "@react-navigation/stack";
 
 type LoginScreenNavigationProp = StackNavigationProp<
@@ -21,18 +24,39 @@ interface LoginScreenProps {
   navigation: LoginScreenNavigationProp;
 }
 
+const USER_STORAGE_KEY = "user";
+
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  // Get the current color scheme (light or dark)
   const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
-  const isDarkMode = colorScheme == "dark";
+  const handleLogin = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem(USER_STORAGE_KEY);
 
-  const handleLogin = () => {
-    console.log("Username:", username);
-    console.log("Password:", password);
+      if (!storedUser) {
+        Alert.alert("Error", "No user found. Please register first.");
+        return;
+      }
+
+      const user = JSON.parse(storedUser);
+
+      if (user.username === username && user.password === password) {
+        Alert.alert("Success", "Login successful!");
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "Main" }],
+        });
+      } else {
+        Alert.alert("Error", "Invalid username or password.");
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      Alert.alert("Error", "An unexpected error occurred. Please try again.");
+    }
   };
 
   const themeStyles = isDarkMode ? darkThemeStyles : lightThemeStyles;
@@ -40,11 +64,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.container, themeStyles.container]}>
       <StatusBar />
-      <View style={{marginHorizontal: 20}}>
+      <View style={{ marginHorizontal: 20 }}>
         <Text style={[styles.title, themeStyles.text]}>Sign In</Text>
         <TextInput
           style={[styles.input, themeStyles.input]}
-          placeholder="Enter your username"
+          placeholder="Enter your email"
           value={username}
           onChangeText={setUsername}
           placeholderTextColor={isDarkMode ? "#8E8E93" : "#C7C7CC"}
@@ -83,14 +107,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
 export default LoginScreen;
 
-// Common styles
+// Common styles (unchanged from your code)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
     justifyContent: "center",
   },
-
   title: {
     fontSize: 28,
     fontWeight: "600",

@@ -4,12 +4,13 @@ import {
   PrivacySettingsScreen,
   ProfileSettingsScreen,
   SettingsScreen,
+  SupportScreen,
 } from "../screens/app";
 import { useTheme } from "../providers/theme.provider";
 import { StatusBar } from "react-native";
-import SupportScreen from "../screens/app/settings/Support-screen";
 import NotificationsScreen from "../screens/app/settings/notifications-screen";
 import AppearanceSettings from "../screens/app/settings/appearance-settings";
+import AuthNavigation from "./auth.navigation";
 
 const Stack = createNativeStackNavigator();
 
@@ -60,7 +61,7 @@ const SettingsNavigations = () => {
         <Stack.Screen
           name="Support"
           component={SupportScreen}
-          options={{ headerTitle: "Support AI" }}
+          options={{ headerTitle: "Support AI by MAAI" }}
         />
         <Stack.Screen
           name="Notifications"
@@ -71,6 +72,11 @@ const SettingsNavigations = () => {
           name="AppearanceSettings"
           component={AppearanceSettings}
           options={{ headerTitle: "Appearance Settings" }}
+        />
+        <Stack.Screen
+          name="Auth"
+          component={AuthNavigation}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </>

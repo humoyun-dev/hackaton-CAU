@@ -91,6 +91,7 @@ const SupportScreen = () => {
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
+      // @ts-ignore
       console.error("Error with OpenAIService:", error.message);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),

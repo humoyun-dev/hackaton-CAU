@@ -8,8 +8,11 @@ import {
   SafeAreaView,
   useColorScheme,
   StatusBar,
+  Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthStackParamList } from "../../navigations/types";
+// @ts-ignore
 import { StackNavigationProp } from "@react-navigation/stack";
 
 type RegisterScreenNavigationProp = StackNavigationProp<
@@ -21,21 +24,43 @@ interface RegisterScreenProps {
   navigation: RegisterScreenNavigationProp;
 }
 
+const USER_STORAGE_KEY = "user";
+
 const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
-  // Get the current color scheme (light or dark)
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
 
-  const handleRegister = () => {
-    if (password === confirmPassword) {
-      console.log("Email:", email);
-      console.log("Password:", password);
-    } else {
-      console.log("Passwords do not match.");
+  const handleRegister = async () => {
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      Alert.alert("Error", "All fields are required.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+
+    try {
+      const userData = {
+        firstName,
+        lastName,
+        email,
+        password,
+      };
+
+      await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
+      Alert.alert("Success", "Account created successfully!");
+      navigation.navigate("CustomizeProfile");
+    } catch (error) {
+      console.error("Failed to register:", error);
+      Alert.alert("Error", "An error occurred during registration.");
     }
   };
 
@@ -43,13 +68,29 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[styles.container, themeStyles.container]}>
-      <StatusBar />
-      <View style={{ marginHorizontal: 20 }}>
-        <Text style={[styles.title, themeStyles.text]}>Register</Text>
+      <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+      <View style={styles.innerContainer}>
+        <Text style={[styles.title, themeStyles.text]}>Create Account</Text>
 
         <TextInput
           style={[styles.input, themeStyles.input]}
-          placeholder="Enter your email"
+          placeholder="First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+          placeholderTextColor={isDarkMode ? "#8E8E93" : "#C7C7CC"}
+        />
+
+        <TextInput
+          style={[styles.input, themeStyles.input]}
+          placeholder="Last Name"
+          value={lastName}
+          onChangeText={setLastName}
+          placeholderTextColor={isDarkMode ? "#8E8E93" : "#C7C7CC"}
+        />
+
+        <TextInput
+          style={[styles.input, themeStyles.input]}
+          placeholder="Email"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
@@ -58,7 +99,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 
         <TextInput
           style={[styles.input, themeStyles.input]}
-          placeholder="Enter your password"
+          placeholder="Password"
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -67,7 +108,7 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 
         <TextInput
           style={[styles.input, themeStyles.input]}
-          placeholder="Confirm your password"
+          placeholder="Confirm Password"
           secureTextEntry
           value={confirmPassword}
           onChangeText={setConfirmPassword}
@@ -84,10 +125,10 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.loginLink}
           onPress={() => navigation.navigate("Login")}
+          style={styles.linkContainer}
         >
-          <Text style={[styles.loginText, themeStyles.linkText]}>
+          <Text style={[styles.linkText, themeStyles.linkText]}>
             Already have an account? Log In
           </Text>
         </TouchableOpacity>
@@ -98,46 +139,47 @@ const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
 
 export default RegisterScreen;
 
-// Common styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+  },
+  innerContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    flex: 1,
     justifyContent: "center",
   },
   title: {
-    fontSize: 28,
-    fontWeight: "600",
-    marginBottom: 32,
+    fontSize: 34,
+    fontWeight: "700",
     textAlign: "center",
+    marginBottom: 32,
   },
   input: {
     height: 50,
-    borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    fontSize: 17,
     marginBottom: 20,
-    paddingHorizontal: 15,
-    fontSize: 16,
+    borderWidth: 1,
   },
   button: {
-    padding: 15,
-    borderRadius: 10,
+    height: 50,
+    borderRadius: 12,
+    justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
+    marginTop: 20,
   },
   buttonText: {
     fontSize: 17,
     fontWeight: "600",
   },
-  loginLink: {
+  linkContainer: {
     marginTop: 20,
-    alignSelf: "center",
+    alignItems: "center",
   },
-  loginText: {
-    fontSize: 16,
+  linkText: {
+    fontSize: 15,
     fontWeight: "500",
   },
 });

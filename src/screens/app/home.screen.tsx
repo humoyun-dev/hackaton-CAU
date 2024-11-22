@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   SafeAreaView,
   Text,
@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MagnifyingGlassIcon } from "react-native-heroicons/outline";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Banner from "../../ui/banner";
 import Recommendation from "../../ui/recommendation";
 import ChallengeCard from "../../ui/challenge-card";
@@ -22,6 +23,8 @@ import { challenges } from "../../data/fitnes";
 const HomeScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [recommendedFoods, setRecommendedFoods] = useState([]);
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const isDarkMode = colorScheme === "dark";
@@ -38,8 +41,55 @@ const HomeScreen: React.FC = () => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    fetchUserData(); // Reload user data and recommendations
     setTimeout(() => setRefreshing(false), 2000);
   }, []);
+
+  // Fetch user data from AsyncStorage
+  const fetchUserData = useCallback(async () => {
+    try {
+      const userJson = await AsyncStorage.getItem("user");
+      if (userJson !== null) {
+        const user = JSON.parse(userJson);
+        setUserData(user);
+        recommendFoods(user);
+      }
+    } catch (error) {
+      console.error("Failed to load user data", error);
+    }
+  }, []);
+
+  const recommendFoods = useCallback(
+    // @ts-ignore
+    (user) => {
+      // Filter foods based on allergies
+      let filteredFoods = foods.filter((food) => {
+        // @ts-ignore
+        const hasAllergens = food.allergens?.some((allergen) =>
+          user.allergies?.includes(allergen)
+        );
+        if (hasAllergens) return false;
+        // @ts-ignore
+        if (
+          user.medicalConditions?.includes("diabetes") &&
+          // @ts-ignore
+          food.sugarContent > 10
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+
+      // @ts-ignore
+      setRecommendedFoods(filteredFoods.slice(0, 5));
+    },
+    [foods]
+  );
+
+  useEffect(() => {
+    fetchUserData();
+  }, [fetchUserData]);
 
   const renderSectionHeader = useCallback(
     ({ title }: { title: string }) => (
@@ -77,9 +127,7 @@ const HomeScreen: React.FC = () => {
           />
         }
       >
-        <Text style={[styles.header, { color: colors.text }]}>
-          Welcome
-        </Text>
+        <Text style={[styles.header, { color: colors.text }]}>Welcome</Text>
 
         <View
           style={[
@@ -99,9 +147,10 @@ const HomeScreen: React.FC = () => {
 
         {renderSectionHeader({ title: "Food Recommendations" })}
         <FlatList
-          data={foods}
+          data={recommendedFoods}
           horizontal
           showsHorizontalScrollIndicator={false}
+          // @ts-ignore
           keyExtractor={(item) => item.id.toString()}
           renderItem={renderRecommendation}
           contentContainerStyle={styles.recommendationList}

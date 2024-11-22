@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -9,13 +9,35 @@ import {
   TextInput,
 } from "react-native";
 import { X } from "lucide-react-native";
-import PersonalInfo from "../../../ui/person-informations";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../../../providers/theme.provider";
-import { mockUser } from "../../../data/user"; // Import user data
 import { ProfileHeader } from "../../../ui";
+import PersonalInfo from "../../../ui/person-informations";
+import { useNavigation } from "@react-navigation/native";
+
+const USER_STORAGE_KEY = "user";
+
+const getUserData = async () => {
+  try {
+    const data = await AsyncStorage.getItem(USER_STORAGE_KEY);
+    return data ? JSON.parse(data) : null;
+  } catch (error) {
+    console.error("Failed to load user data:", error);
+    return null;
+  }
+};
+
+const saveUserData = async (userData: any) => {
+  try {
+    await AsyncStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
+  } catch (error) {
+    console.error("Failed to save user data:", error);
+  }
+};
 
 const ProfileSettingsScreen = () => {
   const { isDark } = useTheme();
+  const navigation = useNavigation();
 
   const colors = {
     background: isDark ? "#000000" : "#F2F2F7",
@@ -28,20 +50,36 @@ const ProfileSettingsScreen = () => {
     signOutText: "#FF3B30",
   };
 
-  // Initialize state with user data
+  const [user, setUser] = useState<any>(null);
   const [modalVisible, setModalVisible] = useState(false);
-  const [firstName, setFirstName] = useState(mockUser.name.split(" ")[0]);
-  const [lastName, setLastName] = useState(
-    mockUser.name.split(" ").slice(1).join(" ")
-  );
-  const [email, setEmail] = useState(mockUser.email);
-  const [age, setAge] = useState("30"); 
-  const [gender, setGender] = useState("Male");
-  const [weight, setWeight] = useState("75 kg"); 
-  const [height, setHeight] = useState("180 cm"); 
 
-  const handleSave = () => {
-    console.log("User data saved:", {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      const userData = await getUserData();
+      if (userData) {
+        setUser(userData);
+        setFirstName(userData.firstName || "");
+        setLastName(userData.lastName || "");
+        setEmail(userData.email || "");
+        setAge(userData.age || "");
+        setGender(userData.gender || "");
+        setWeight(userData.weight || "");
+        setHeight(userData.height || "");
+      }
+    };
+    loadUserData();
+  }, []);
+
+  const handleSave = async () => {
+    const updatedUser = {
       firstName,
       lastName,
       email,
@@ -49,9 +87,30 @@ const ProfileSettingsScreen = () => {
       gender,
       weight,
       height,
-    });
+    };
+    await saveUserData(updatedUser);
+    setUser(updatedUser);
     setModalVisible(false);
+    navigation.reset({
+      index: 0,
+      // @ts-ignore
+      routes: [{ name: "SettingsMain" }],
+    });
   };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem(USER_STORAGE_KEY);
+      navigation.reset({
+        index: 0,
+        // @ts-ignore
+        routes: [{ name: "Auth" }],
+      });
+    } catch (error) {
+      console.error("Failed to log out:", error);
+    }
+  };
+
 
   const renderEditField = (
     label: string,
@@ -126,23 +185,31 @@ const ProfileSettingsScreen = () => {
     >
       <ProfileHeader />
 
-      <PersonalInfo
-        firstName={firstName}
-        lastName={lastName}
-        age={age}
-        gender={gender}
-        weight={weight}
-        height={height}
-        onEdit={() => setModalVisible(true)}
-      />
-
-      <TouchableOpacity
-        style={[styles.signOut, { backgroundColor: colors.cardBackground }]}
-      >
-        <Text style={[styles.signOutText, { color: colors.signOutText }]}>
-          Sign Out
+      {user ? (
+        <>
+          <PersonalInfo
+            firstName={firstName}
+            lastName={lastName}
+            age={age}
+            gender={gender}
+            weight={weight}
+            height={height}
+            onEdit={() => setModalVisible(true)}
+          />
+          <TouchableOpacity
+            style={[styles.signOut, { backgroundColor: colors.cardBackground }]}
+            onPress={handleLogout}
+          >
+            <Text style={[styles.signOutText, { color: colors.signOutText }]}>
+              Sign Out
+            </Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <Text style={[styles.noDataText, { color: colors.subText }]}>
+          No data available. Please add your information.
         </Text>
-      </TouchableOpacity>
+      )}
 
       {renderEditModal()}
     </ScrollView>
@@ -153,13 +220,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  noDataText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginVertical: 40,
+  },
+  infoContainer: {
+    marginVertical: 20,
+  },
+  infoText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
   signOut: {
     marginTop: 32,
     marginHorizontal: 16,
-    padding: 12,
+    padding: 16,
     borderRadius: 12,
     alignItems: "center",
-    marginBottom: 32,
+    justifyContent: "center",
   },
   signOutText: {
     fontSize: 17,
@@ -204,5 +283,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 });
+
 
 export default ProfileSettingsScreen;

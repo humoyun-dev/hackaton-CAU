@@ -4,9 +4,10 @@ import {
   OpenAIMessage,
   OpenAIModelRequest,
   OpenAIModelResponse,
-} from './dtos';
+} from "./dtos";
 
-const OPENAI_API_KEY = "";
+const OPENAI_API_KEY =
+  "";
 
 const OpenAIService = {
   /**
@@ -16,14 +17,17 @@ const OpenAIService = {
    */
   async completions(request: OpenAIChatRequest): Promise<OpenAIChatResponse> {
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify(request),
-      });
+      const response = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
+          },
+          body: JSON.stringify(request),
+        }
+      );
 
       const data = await response.json();
       if (data.error) {
@@ -32,7 +36,7 @@ const OpenAIService = {
 
       return data as OpenAIChatResponse;
     } catch (error) {
-      console.error('Error with OpenAI API chat completions:', error.message);
+      console.error("Error with OpenAI API chat completions:", error.message);
       throw error;
     }
   },
@@ -44,10 +48,10 @@ const OpenAIService = {
    */
   async model(request: OpenAIModelRequest): Promise<OpenAIModelResponse> {
     try {
-      const response = await fetch('https://api.openai.com/v1/completions', {
-        method: 'POST',
+      const response = await fetch("https://api.openai.com/v1/completions", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${OPENAI_API_KEY}`,
         },
         body: JSON.stringify(request),
@@ -60,7 +64,7 @@ const OpenAIService = {
 
       return data as OpenAIModelResponse;
     } catch (error) {
-      console.error('Error with OpenAI API model completions:', error.message);
+      console.error("Error with OpenAI API model completions:", error.message);
       throw error;
     }
   },

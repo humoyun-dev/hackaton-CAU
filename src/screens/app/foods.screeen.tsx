@@ -9,25 +9,34 @@ import {
   StyleSheet,
   FlatList,
   useColorScheme,
+  Dimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { MagnifyingGlassIcon } from "react-native-heroicons/outline";
+import {
+  MagnifyingGlassIcon,
+  XCircleIcon,
+} from "react-native-heroicons/outline";
 import { foods, Food } from "../../data/foods";
 
 interface Category {
   id: number;
   name: string;
+  filter: (food: Food) => boolean;
 }
 
+const { height, width } = Dimensions.get("window");
+
 const categories: Category[] = [
-  { id: 1, name: "Vegan" },
-  { id: 2, name: "High-Protein" },
-  { id: 3, name: "Low-Calorie" },
-  { id: 4, name: "Gluten-Free" },
+  { id: 1, name: "High-Protein", filter: (food) => food.calories >= 550 },
+  { id: 2, name: "Low-Calorie", filter: (food) => food.calories < 550 },
+  { id: 3, name: "Gluten-Free", filter: (food) => food.calories < 350 },
+  { id: 4, name: "Vegan", filter: (food) => food.calories <= 170 },
 ];
+
 const FoodScreen: React.FC = ({ navigation }: any) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
   const isDarkMode = colorScheme === "dark";
@@ -38,7 +47,6 @@ const FoodScreen: React.FC = ({ navigation }: any) => {
       cardBackground: isDarkMode ? "#1C1C1E" : "#FFFFFF",
       text: isDarkMode ? "#FFFFFF" : "#000000",
       secondaryText: isDarkMode ? "#EBEBF5" : "#3C3C43",
-      tertiaryText: isDarkMode ? "#EBEBF599" : "#3C3C434D",
       separator: isDarkMode ? "#38383A" : "#C6C6C8",
       tint: "#007AFF",
       searchBackground: isDarkMode ? "#1C1C1E" : "#E5E5EA",
@@ -47,13 +55,22 @@ const FoodScreen: React.FC = ({ navigation }: any) => {
   );
 
   const filteredFoods = useMemo(() => {
+    const activeFilters = selectedCategories
+      .map((id) => categories.find((cat) => cat.id === id)?.filter)
+      .filter(Boolean) as Array<(food: Food) => boolean>;
+
     return foods.filter(
       (food) =>
         food.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        // @ts-ignore
-        (!selectedCategory || food.categories.includes(selectedCategory))
+        (!activeFilters.length || activeFilters.every((filter) => filter(food)))
     );
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategories]);
+
+  const handleCategoryToggle = (id: number) => {
+    setSelectedCategories((prev) =>
+      prev.includes(id) ? prev.filter((catId) => catId !== id) : [...prev, id]
+    );
+  };
 
   const renderCategoryItem = useCallback(
     ({ item }: { item: Category }) => (
@@ -61,24 +78,20 @@ const FoodScreen: React.FC = ({ navigation }: any) => {
         style={[
           styles.categoryItem,
           {
-            backgroundColor:
-              selectedCategory === item.id
-                ? colors.tint
-                : colors.cardBackground,
+            backgroundColor: selectedCategories.includes(item.id)
+              ? colors.tint
+              : colors.cardBackground,
           },
         ]}
-        onPress={() =>
-          setSelectedCategory(selectedCategory === item.id ? null : item.id)
-        }
+        onPress={() => handleCategoryToggle(item.id)}
       >
         <Text
           style={[
             styles.categoryName,
             {
-              color:
-                selectedCategory === item.id
-                  ? colors.cardBackground
-                  : colors.text,
+              color: selectedCategories.includes(item.id)
+                ? colors.cardBackground
+                : colors.text,
             },
           ]}
         >
@@ -86,8 +99,9 @@ const FoodScreen: React.FC = ({ navigation }: any) => {
         </Text>
       </TouchableOpacity>
     ),
-    [selectedCategory, colors]
+    [selectedCategories, colors]
   );
+
   const renderFoodItem = useCallback(
     ({ item }: { item: Food }) => (
       <TouchableOpacity
@@ -145,6 +159,11 @@ const FoodScreen: React.FC = ({ navigation }: any) => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={() => setSearchQuery("")}>
+            <XCircleIcon size={20} color={colors.secondaryText} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <FlatList
@@ -205,11 +224,11 @@ const styles = StyleSheet.create({
     marginRight: 12,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 20, // Rounded for pill-like appearance
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    elevation: 2, // Shadow for modern look (Android)
-    shadowColor: "#000", // Shadow for iOS
+    elevation: 2,
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
